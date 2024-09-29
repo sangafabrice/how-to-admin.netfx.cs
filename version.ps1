@@ -1,14 +1,14 @@
-<#PSScriptInfo .VERSION 1.0.0#>
+<#PSScriptInfo .VERSION 1.0.1#>
 
 [CmdletBinding()]
 Param ()
 
-git add *.cs *.ps1 *.csproj
+git add *.cs *.ps1 *.csproj manifest.xml
 
 & {
   # Set the version of the executable
   $infoFilePath = "$PSScriptRoot\src\AssemblyInfo.cs"
-  $diff = (git diff HEAD *.cs | ForEach-Object { switch ($_[0]) { "+"{1} "-"{-1} } } | Measure-Object -Sum).Sum
+  $diff = (git diff HEAD *.cs manifest.xml | ForEach-Object { switch ($_[0]) { "+"{1} "-" {-1} } } | Measure-Object -Sum).Sum
   $version = ($diff -eq 0 ? 1:[Math]::Abs($diff)) + ([version](@(git show HEAD $infoFilePath)[-2] -split '"')[1]).Revision
   $matchRegex = '"((\d+\.){3})\d+"'
   $infoContent = (Get-Content $infoFilePath | ForEach-Object { if ($_ -match $matchRegex) { $_ -replace $matchRegex,"`"`${1}$version`"" } else { $_ } }) -join [Environment]::NewLine
