@@ -1,21 +1,17 @@
 /// <summary>Launch the shortcut's target PowerShell script with the markdown.</summary>
-/// <version>0.0.1.5</version>
+/// <version>0.0.1.6</version>
 
 using System;
 using System.Diagnostics;
 using System.Reflection;
-using System.ComponentModel;
-using System.Security.Principal;
 using System.Management;
 
 namespace cvmd2html
 {
   static class Program
   {
-    static void Main(string[] args)
+    static void Main()
     {
-      RequestAdminPrivileges(args);
-
       /** The application execution. */
       if (!String.IsNullOrEmpty(Parameters.Markdown))
       {
@@ -74,41 +70,7 @@ namespace cvmd2html
       // The process termination event query. Win32_ProcessStopTrace requires admin rights to be used.
       var wmiQuery = "SELECT * FROM Win32_ProcessStopTrace WHERE ProcessName='cmd.exe' AND ProcessId=" + processId;
       // Wait for the process to exit.
-      return (uint)new ManagementEventWatcher(wmiQuery).WaitForNextEvent().Properties["ExitStatus"].Value;
-    }
-
-    /// <summary>Request administrator privileges.</summary>
-    /// <param name="args">The command line arguments.</param>
-    static void RequestAdminPrivileges(string[] args)
-    {
-      if (IsCurrentProcessElevated()) return;
-      try
-      {
-        Process.Start(
-          new ProcessStartInfo(Path, args.Length > 0 ? String.Format(@"""{0}""", String.Join(@""" """, args)):"")
-          {
-            UseShellExecute = true,
-            Verb = "runas",
-            WindowStyle = ProcessWindowStyle.Hidden
-          }
-        );
-      }
-      catch (Win32Exception)
-      {
-        Quit(0);
-      }
-      catch (Exception)
-      {
-        Quit(1);
-      }
-      Quit(0);
-    }
-
-    /// <summary>Check if the process is elevated.</summary>
-    /// <returns>True if the running process is elevated, false otherwise.</returns>
-    static bool IsCurrentProcessElevated()
-    {
-      return new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
+      return (uint)new ManagementEventWatcher(wmiQuery).WaitForNextEvent()["ExitStatus"];
     }
 
     /// <summary>Clean up and quit.</summary>
