@@ -1,20 +1,17 @@
 /// <summary>Launch the shortcut's target PowerShell script with the markdown.</summary>
-/// <version>0.0.1.4</version>
+/// <version>0.0.1.5</version>
 
 using System;
 using System.Diagnostics;
 using System.Reflection;
-using System.Security.Principal;
 using System.Management;
 
 namespace cvmd2html
 {
   static class Program
   {
-    static void Main(string[] args)
+    static void Main()
     {
-      RequestAdminPrivileges(args);
-
       /** The application execution. */
       if (!string.IsNullOrEmpty(Parameters.Markdown))
       {
@@ -66,31 +63,6 @@ namespace cvmd2html
       // Wait for the process to exit.
       return (uint)new ManagementEventWatcher(wmiQuery).WaitForNextEvent()["ExitStatus"];
     }
-
-    /// <summary>Request administrator privileges.</summary>
-    /// <param name="args">The command line arguments.</param>
-    static void RequestAdminPrivileges(string[] args)
-    {
-      if (IsCurrentProcessElevated()) return;
-      try
-      {
-        Process.Start(
-          new ProcessStartInfo(Path, args.Length > 0 ? string.Format(@"""{0}""", string.Join(@""" """, args)):"")
-          {
-            UseShellExecute = true,
-            Verb = "runas",
-            WindowStyle = ProcessWindowStyle.Hidden
-          }
-        );
-      }
-      catch
-      { }
-      Quit(0);
-    }
-
-    /// <summary>Check if the process is elevated.</summary>
-    /// <returns>True if the running process is elevated, false otherwise.</returns>
-    static bool IsCurrentProcessElevated() => new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
 
     /// <summary>Clean up and quit.</summary>
     /// <param name="exitCode">The exit code.</param>
