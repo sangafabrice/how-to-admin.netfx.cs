@@ -1,13 +1,11 @@
 /// <summary>Launch the shortcut's target PowerShell script with the markdown.</summary>
-/// <version>0.0.1.3</version>
+/// <version>0.0.1.4</version>
 
 using System;
 using System.Diagnostics;
 using System.Reflection;
+using System.Security.Principal;
 using System.Management;
-using ROOT.CIMV2;
-
-[assembly: AssemblyTitle("CvMd2Html")]
 
 namespace cvmd2html
 {
@@ -92,12 +90,7 @@ namespace cvmd2html
 
     /// <summary>Check if the process is elevated.</summary>
     /// <returns>True if the running process is elevated, false otherwise.</returns>
-    static bool IsCurrentProcessElevated()
-    {
-      const uint HKU = 0x80000003;
-      StdRegProv.CheckAccess(HKU, @"S-1-5-19\Environment", out bool bGranted);
-      return bGranted;
-    }
+    static bool IsCurrentProcessElevated() => new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
 
     /// <summary>Clean up and quit.</summary>
     /// <param name="exitCode">The exit code.</param>
