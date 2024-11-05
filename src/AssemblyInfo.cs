@@ -4,5 +4,5 @@ using System.Reflection;
 [assembly: AssemblyCopyright("© 2024 sangafabrice")]
 [assembly: AssemblyCompany("sangafabrice")]
 [assembly: AssemblyTitle("CvMd2Html")]
-[assembly: AssemblyInformationalVersion("0.0.1.5")]
-[assembly: AssemblyVersion("0.0.1.5")]
+[assembly: AssemblyInformationalVersion("0.0.1.6")]
+[assembly: AssemblyVersion("0.0.1.6")]
