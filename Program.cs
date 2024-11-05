@@ -1,5 +1,5 @@
 /// <summary>Launch the shortcut's target PowerShell script with the markdown.</summary>
-/// <version>0.0.1.1</version>
+/// <version>0.0.1.2</version>
 
 using System;
 using System.Diagnostics;
@@ -11,6 +11,7 @@ namespace cvmd2html
 {
   static class Program
   {
+    [STAThread]
     static void Main(string[] args)
     {
       RequestAdminPrivileges(args);
@@ -91,7 +92,7 @@ namespace cvmd2html
     static void RequestAdminPrivileges(string[] args)
     {
       if (IsCurrentProcessElevated()) return;
-      dynamic shell = new Shell();
+      var shell = new Shell();
       shell.ShellExecute(Path, String.Format(@"""{0}""", String.Join(@""" """, args)), Missing.Value, "runas", Constants.vbHidden);
       _.ReleaseComObject(ref shell);
       Quit(0);
