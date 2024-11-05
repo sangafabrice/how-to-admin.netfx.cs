@@ -1,18 +1,19 @@
 /// <summary>Launch the shortcut's target PowerShell script with the markdown.</summary>
-/// <version>0.0.1.0</version>
+/// <version>0.0.1.1</version>
 
 using System;
 using System.Diagnostics;
 using System.Reflection;
 using Microsoft.VisualBasic;
+using Shell32;
 
 namespace cvmd2html
 {
   static class Program
   {
-    static void Main()
+    static void Main(string[] args)
     {
-      RequestAdminPrivileges();
+      RequestAdminPrivileges(args);
 
       /** The application execution. */
       if (!String.IsNullOrEmpty(Parameters.Markdown))
@@ -86,11 +87,12 @@ namespace cvmd2html
     }
 
     /// <summary>Request administrator privileges.</summary>
-    static void RequestAdminPrivileges()
+    /// <param name="args">The command line arguments.</param>
+    static void RequestAdminPrivileges(string[] args)
     {
       if (IsCurrentProcessElevated()) return;
-      dynamic shell = Util.CreateObject("Shell.Application");
-      shell.ShellExecute(Path, Interaction.Command(), Missing.Value, "runas", Constants.vbHidden);
+      dynamic shell = new Shell();
+      shell.ShellExecute(Path, args.Length > 0 ? (String.Format(@"""{0}""", String.Join(@""" """, args)) as dynamic):Missing.Value, Missing.Value, "runas", Constants.vbHidden);
       Util.ReleaseComObject(ref shell);
       Quit(0);
     }
