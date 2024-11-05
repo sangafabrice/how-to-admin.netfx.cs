@@ -1,0 +1,15 @@
+<!-- 0.0.1.0 -->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>library</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="src\AssemblyInfo.cs;src\StdRegProv.cs" />
+    <Reference Include="Interop.WbemScripting.dll">
+      <HintPath>lib\Interop.WbemScripting.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

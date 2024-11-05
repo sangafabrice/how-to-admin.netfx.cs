@@ -1,23 +1,24 @@
-<!-- 0.0.1.1 -->
+<!-- 0.0.1.2 -->
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>winexe</OutputType>
     <TargetFramework>net9.0</TargetFramework>
     <LangVersion>latest</LangVersion>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="src\AssemblyInfo.cs;src\ErrorLog.cs;src\Package.cs;src\Parameters.cs;src\Setup.cs;src\Util.cs;Program.cs" />
+    <Reference Include="StdRegProv.dll">
+      <HintPath>lib\StdRegProv.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationFramework.dll">
       <HintPath>C:\Windows\Microsoft.NET\Framework64\v4.0.30319\WPF\PresentationFramework.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.VisualBasic.dll" />
     <Reference Include="Interop.IWshRuntimeLibrary.dll">
       <HintPath>lib\Interop.IWshRuntimeLibrary.dll</HintPath>
     </Reference>
     <Reference Include="Interop.WbemScripting.dll">
       <HintPath>lib\Interop.WbemScripting.dll</HintPath>
-    </Reference>
-    <Reference Include="Interop.Shell32.dll">
-      <HintPath>lib\Interop.Shell32.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>
