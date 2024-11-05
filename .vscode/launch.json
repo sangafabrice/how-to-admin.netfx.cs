@@ -9,6 +9,13 @@
       "args": ["-Debug"]
     },
     {
+      "name": "Import",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": "${workspaceFolder}/package.ps1",
+      "args": []
+    },
+    {
       "name": "Test",
       "type": "PowerShell",
       "request": "launch",
