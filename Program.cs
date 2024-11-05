@@ -1,17 +1,19 @@
 /// <summary>Launch the shortcut's target PowerShell script with the markdown.</summary>
-/// <version>0.0.1.2</version>
+/// <version>0.0.1.3</version>
 
 using System;
 using System.Diagnostics;
 using System.Reflection;
-using Microsoft.VisualBasic;
-using Shell32;
+using System.ComponentModel;
+using WbemScripting;
+using ROOT.CIMV2;
+
+[assembly: AssemblyTitle("CvMd2Html")]
 
 namespace cvmd2html
 {
   static class Program
   {
-    [STAThread]
     static void Main(string[] args)
     {
       RequestAdminPrivileges(args);
@@ -74,7 +76,9 @@ namespace cvmd2html
       // The process termination event query. Win32_ProcessStopTrace requires admin rights to be used.
       var wmiQuery = "SELECT * FROM Win32_ProcessStopTrace WHERE ProcessName='cmd.exe' AND ProcessId=" + processId;
       // Wait for the process to exit.
-      dynamic watcher = Util.GetObject().ExecNotificationQuery(wmiQuery);
+      var wbemLocator = new SWbemLocator();
+      SWbemServices wmiService = wbemLocator.ConnectServer();
+      SWbemEventSource watcher = wmiService.ExecNotificationQuery(wmiQuery);
       dynamic cmdProcess = watcher.NextEvent();
       try
       {
@@ -84,6 +88,8 @@ namespace cvmd2html
       {
         Util.ReleaseComObject(ref cmdProcess);
         Util.ReleaseComObject(ref watcher);
+        Util.ReleaseComObject(ref wmiService);
+        Util.ReleaseComObject(ref wbemLocator);
       }
     }
 
@@ -92,9 +98,25 @@ namespace cvmd2html
     static void RequestAdminPrivileges(string[] args)
     {
       if (IsCurrentProcessElevated()) return;
-      var shell = new Shell();
-      shell.ShellExecute(Path, args.Length > 0 ? (String.Format(@"""{0}""", String.Join(@""" """, args)) as dynamic):Missing.Value, Missing.Value, "runas", Constants.vbHidden);
-      Util.ReleaseComObject(ref shell);
+      try
+      {
+        Process.Start(
+          new ProcessStartInfo(Path, args.Length > 0 ? String.Format(@"""{0}""", String.Join(@""" """, args)):"")
+          {
+            UseShellExecute = true,
+            Verb = "runas",
+            WindowStyle = ProcessWindowStyle.Hidden
+          }
+        );
+      }
+      catch (Win32Exception)
+      {
+        Quit(0);
+      }
+      catch (Exception)
+      {
+        Quit(1);
+      }
       Quit(0);
     }
 
@@ -102,9 +124,9 @@ namespace cvmd2html
     /// <returns>True if the running process is elevated, false otherwise.</returns>
     static bool IsCurrentProcessElevated()
     {
-      const int HKU = unchecked((int)0x80000003);
+      const uint HKU = 0x80000003;
       bool bGranted;
-      Util.Registry.CheckAccess(HKU, @"S-1-5-19\Environment", Missing.Value, out bGranted);
+      StdRegProv.CheckAccess(HKU, @"S-1-5-19\Environment", out bGranted);
       return bGranted;
     }
 
@@ -112,7 +134,6 @@ namespace cvmd2html
     /// <param name="exitCode">The exit code.</param>
     internal static void Quit(int exitCode)
     {
-      Util.Dispose();
       GC.Collect();
       Environment.Exit(exitCode);
     }

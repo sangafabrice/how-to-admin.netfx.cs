@@ -1,32 +1,15 @@
 /// <summary>Some utility methods.</summary>
-/// <version>0.0.1.1</version>
+/// <version>0.0.1.2</version>
 
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
-using WbemScripting;
 
 namespace cvmd2html
 {
   static class Util
   {
-    static SWbemLocator wbemLocator = new SWbemLocator();
-    static SWbemServices wmiService = wbemLocator.ConnectServer();
-    internal static dynamic Registry = GetObject("StdRegProv");
-
-    /// <summary>Get a WMI object or class.</summary>
-    /// <param name="monikerPath">The moniker path.</param>
-    /// <returns>A WMI object or class.</returns>
-    internal static dynamic GetObject(string monikerPath = null)
-    {
-      if (String.IsNullOrEmpty(monikerPath))
-      {
-        return wmiService;
-      }
-      return wmiService.Get(monikerPath);
-    }
-
     /// <summary>Generate a random file path.</summary>
     /// <param name="extension">The file extension.</param>
     /// <returns>A random file path.</returns>
@@ -54,14 +37,6 @@ namespace cvmd2html
     internal static void Popup(string messageText, MessageBoxImage popupType = MessageBoxImage.None, MessageBoxButton popupButtons = MessageBoxButton.OK)
     {
       MessageBox.Show(messageText, "Convert to HTML", popupButtons, popupType);
-    }
-
-    /// <summary>Destroy the COM objects.</summary>
-    internal static void Dispose()
-    {
-      ReleaseComObject(ref Registry);
-      ReleaseComObject(ref wmiService);
-      ReleaseComObject(ref wbemLocator);
     }
 
     /// <summary>Release the specified COM object.</summary>
