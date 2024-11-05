@@ -1,23 +1,19 @@
 /// <summary>Some utility methods.</summary>
-/// <version>0.0.1.0</version>
+/// <version>0.0.1.1</version>
 
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
+using WbemScripting;
 
 namespace cvmd2html
 {
   static class Util
   {
-    static dynamic wbemLocator = CreateObject("WbemScripting.SWbemLocator");
-    static dynamic wmiService = wbemLocator.ConnectServer();
+    static SWbemLocator wbemLocator = new();
+    static SWbemServices wmiService = wbemLocator.ConnectServer();
     internal static dynamic Registry = GetObject("StdRegProv");
-
-    /// <summary>Create object.</summary>
-    /// <param name="progId">The com class ProgId.</param>
-    /// <returns>A COM object.</returns>
-    internal static dynamic CreateObject(string progId) => Activator.CreateInstance(Type.GetTypeFromProgID(progId));
 
     /// <summary>Get a WMI object or class.</summary>
     /// <param name="monikerPath">The moniker path.</param>
