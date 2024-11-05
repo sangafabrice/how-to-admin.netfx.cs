@@ -1,4 +1,4 @@
-<#PSScriptInfo .VERSION 1.0.0#>
+<#PSScriptInfo .VERSION 1.0.1#>
 
 using namespace System.Management.Automation
 [CmdletBinding()]
@@ -26,7 +26,9 @@ Param ()
     & "$PSScriptRoot\TlbImp.exe" /nologo /silent $TypeLibPath /out:"$LibDir\Interop.$Namespace.dll" /namespace:$Namespace
   }
 
+  ImportTypeLibrary 'C:\Windows\System32\wbem\wbemdisp.tlb' 'WbemScripting'
   ImportTypeLibrary 'C:\Windows\System32\wshom.ocx' 'IWshRuntimeLibrary'
+  ImportTypeLibrary 'C:\Windows\System32\Shell32.dll' 'Shell32'
 
   Get-ChildItem "$LibDir\*" -Directory | Remove-Item -Recurse -Force
   'PresentationFramework','WindowsBase','PresentationCore' |

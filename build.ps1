@@ -1,10 +1,11 @@
-<#PSScriptInfo .VERSION 1.0.0#>
+<#PSScriptInfo .VERSION 1.0.1#>
 
 using namespace System.Management.Automation
 [CmdletBinding()]
 Param ()
 
 & "$PSScriptRoot\package.ps1"
+& "$PSScriptRoot\version.ps1"
 & "$PSScriptRoot\clean.ps1"
 
 & {
@@ -32,7 +33,7 @@ Param ()
   # Compile the source code with csc.exe.
   $EnvPath = $Env:Path
   $Env:Path = "$Env:windir\Microsoft.NET\Framework$(If ([Environment]::Is64BitOperatingSystem) { '64' })\v4.0.30319\;$Env:Path"
-  csc.exe /nologo /target:$($DebugPreference -eq 'Continue' ? 'exe':'winexe') /win32icon:"$PSScriptRoot\menu.ico" /reference:"$BinDir\Interop.IWshRuntimeLibrary.dll" /reference:Microsoft.VisualBasic.dll /reference:"$BinDir\PresentationFramework.dll" /reference:"$BinDir\PresentationCore.dll" /reference:"$BinDir\WindowsBase.dll" /reference:System.Xaml.dll /out:$(($ConvertExe = "$BinDir\cvmd2html.exe")) "$(($SrcDir = "$PSScriptRoot\src"))\AssemblyInfo.cs" "$SrcDir\ErrorLog.cs" "$SrcDir\Package.cs" "$SrcDir\Parameters.cs" "$PSScriptRoot\Program.cs" "$SrcDir\Setup.cs" "$SrcDir\Util.cs"
+  csc.exe /nologo /target:$($DebugPreference -eq 'Continue' ? 'exe':'winexe') /win32icon:"$PSScriptRoot\menu.ico" /reference:"$BinDir\Interop.WbemScripting.dll" /reference:"$BinDir\Interop.Shell32.dll" /reference:"$BinDir\Interop.IWshRuntimeLibrary.dll" /reference:Microsoft.VisualBasic.dll /reference:"$BinDir\PresentationFramework.dll" /reference:"$BinDir\PresentationCore.dll" /reference:"$BinDir\WindowsBase.dll" /reference:System.Xaml.dll /out:$(($ConvertExe = "$BinDir\cvmd2html.exe")) "$(($SrcDir = "$PSScriptRoot\src"))\AssemblyInfo.cs" "$SrcDir\ErrorLog.cs" "$SrcDir\Package.cs" "$SrcDir\Parameters.cs" "$PSScriptRoot\Program.cs" "$SrcDir\Setup.cs" "$SrcDir\Util.cs"
   $Env:Path = $EnvPath
 
   If ($LASTEXITCODE -eq 0) {
