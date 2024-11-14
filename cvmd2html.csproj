@@ -1,4 +1,4 @@
-<!-- 0.0.1.2 -->
+<!-- 0.0.1.3 -->
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>winexe</OutputType>
@@ -14,11 +14,11 @@
     <Reference Include="PresentationFramework.dll">
       <HintPath>C:\Windows\Microsoft.NET\Framework64\v4.0.30319\WPF\PresentationFramework.dll</HintPath>
     </Reference>
+    <Reference Include="System.Management.dll">
+      <HintPath>C:\Windows\Microsoft.Net\assembly\GAC_MSIL\System.Management\v4.0_4.0.0.0__b03f5f7f11d50a3a\System.Management.dll</HintPath>
+    </Reference>
     <Reference Include="Interop.IWshRuntimeLibrary.dll">
       <HintPath>lib\Interop.IWshRuntimeLibrary.dll</HintPath>
-    </Reference>
-    <Reference Include="Interop.WbemScripting.dll">
-      <HintPath>lib\Interop.WbemScripting.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>
