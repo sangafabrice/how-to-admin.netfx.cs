@@ -1,5 +1,5 @@
 /// <summary>Launch the shortcut's target PowerShell script with the markdown.</summary>
-/// <version>0.0.1.3</version>
+/// <version>0.0.1.4</version>
 
 using System;
 using System.Diagnostics;
@@ -79,13 +79,17 @@ namespace cvmd2html
       var wbemLocator = new SWbemLocator();
       SWbemServices wmiService = wbemLocator.ConnectServer();
       SWbemEventSource watcher = wmiService.ExecNotificationQuery(wmiQuery);
-      dynamic cmdProcess = watcher.NextEvent();
+      SWbemObject cmdProcess = watcher.NextEvent();
+      SWbemPropertySet properties = cmdProcess.Properties_;
+      SWbemProperty ExitStatus = properties.Item("ExitStatus");
       try
       {
-        return cmdProcess.ExitStatus;
+        return (int)ExitStatus.get_Value();
       }
       finally
       {
+        _.ReleaseComObject(ref ExitStatus);
+        _.ReleaseComObject(ref properties);
         _.ReleaseComObject(ref cmdProcess);
         _.ReleaseComObject(ref watcher);
         _.ReleaseComObject(ref wmiService);
