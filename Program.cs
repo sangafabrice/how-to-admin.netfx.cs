@@ -1,10 +1,10 @@
 /// <summary>Launch the shortcut's target PowerShell script with the markdown.</summary>
-/// <version>0.0.1.2</version>
+/// <version>0.0.1.3</version>
 
 using System;
 using System.Diagnostics;
 using System.Reflection;
-using WbemScripting;
+using System.Management;
 using ROOT.CIMV2;
 
 [assembly: AssemblyTitle("CvMd2Html")]
@@ -61,26 +61,12 @@ namespace cvmd2html
     /// <summary>Wait for the process exit.</summary>
     /// <param name="processId">The process identifier.</param>
     /// <returns>The exit status of the process.</returns>
-    static int WaitForExit(int processId)
+    static uint WaitForExit(int processId)
     {
       // The process termination event query. Win32_ProcessStopTrace requires admin rights to be used.
       var wmiQuery = "SELECT * FROM Win32_ProcessStopTrace WHERE ProcessName='cmd.exe' AND ProcessId=" + processId;
       // Wait for the process to exit.
-      SWbemLocator wbemLocator = new();
-      SWbemServices wmiService = wbemLocator.ConnectServer();
-      SWbemEventSource watcher = wmiService.ExecNotificationQuery(wmiQuery);
-      dynamic cmdProcess = watcher.NextEvent();
-      try
-      {
-        return cmdProcess.ExitStatus;
-      }
-      finally
-      {
-        Util.ReleaseComObject(ref cmdProcess);
-        Util.ReleaseComObject(ref watcher);
-        Util.ReleaseComObject(ref wmiService);
-        Util.ReleaseComObject(ref wbemLocator);
-      }
+      return (uint)new ManagementEventWatcher(wmiQuery).WaitForNextEvent()["ExitStatus"];
     }
 
     /// <summary>Request administrator privileges.</summary>
