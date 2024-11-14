@@ -1,11 +1,9 @@
 /// <summary>StdRegProv WMI class as inspired by mgmclassgen.exe.</summary>
-/// <version>0.0.1.0</version>
+/// <version>0.0.1.1</version>
 
-using System;
+using System.Management;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Diagnostics;
-using WbemScripting;
 
 [assembly: AssemblyTitle("StdRegProv")]
 
@@ -17,51 +15,88 @@ namespace ROOT.CIMV2
 
     public static uint CheckAccess(uint hDefKey, string sSubKeyName, out bool bGranted)
     {
-      using StdRegProvHelper Registry = new(CreatedClassName);
-      return (uint)(Registry.Provider as dynamic).CheckAccess(unchecked((int)hDefKey), sSubKeyName, Missing.Value, out bGranted);
+      string methodName = GetMethodName(new());
+      ManagementClass classObj = new(CreatedClassName);
+      ManagementBaseObject inParams = classObj.GetMethodParameters(methodName);
+      inParams["hDefKey"] = hDefKey;
+      inParams["sSubKeyName"] = sSubKeyName;
+      ManagementBaseObject outParams = classObj.InvokeMethod(methodName, inParams, null);
+      bGranted = (bool)outParams["bGranted"];
+      return (uint)outParams["ReturnValue"];
     }
 
     public static uint CreateKey(uint hDefKey, string sSubKeyName)
     {
-      using StdRegProvHelper Registry = new(CreatedClassName);
-      return (uint)(Registry.Provider as dynamic).CreateKey(unchecked((int)hDefKey), sSubKeyName);
+      string methodName = GetMethodName(new());
+      ManagementClass classObj = new(CreatedClassName);
+      ManagementBaseObject inParams = classObj.GetMethodParameters(methodName);
+      inParams["hDefKey"] = hDefKey;
+      inParams["sSubKeyName"] = sSubKeyName;
+      ManagementBaseObject outParams = classObj.InvokeMethod(methodName, inParams, null);
+      return (uint)outParams["ReturnValue"];
     }
 
     public static uint DeleteKey(uint hDefKey, string sSubKeyName)
     {
-      using StdRegProvHelper Registry = new(CreatedClassName);
-      return (uint)(Registry.Provider as dynamic).DeleteKey(unchecked((int)hDefKey), sSubKeyName);
+      string methodName = GetMethodName(new());
+      ManagementClass classObj = new(CreatedClassName);
+      ManagementBaseObject inParams = classObj.GetMethodParameters(methodName);
+      inParams["hDefKey"] = hDefKey;
+      inParams["sSubKeyName"] = sSubKeyName;
+      ManagementBaseObject outParams = classObj.InvokeMethod(methodName, inParams, null);
+      return (uint)outParams["ReturnValue"];
     }
 
     public static uint DeleteValue(uint hDefKey, string sSubKeyName, string sValueName = null)
     {
-      using StdRegProvHelper Registry = new(CreatedClassName);
-      return (uint)(Registry.Provider as dynamic).DeleteValue(unchecked((int)hDefKey), sSubKeyName, sValueName);
+      string methodName = GetMethodName(new());
+      ManagementClass classObj = new(CreatedClassName);
+      ManagementBaseObject inParams = classObj.GetMethodParameters(methodName);
+      inParams["hDefKey"] = hDefKey;
+      inParams["sSubKeyName"] = sSubKeyName;
+      inParams["sValueName"] = sValueName;
+      ManagementBaseObject outParams = classObj.InvokeMethod(methodName, inParams, null);
+      return (uint)outParams["ReturnValue"];
     }
 
     public static uint EnumKey(uint hDefKey, string sSubKeyName, out string[] sNames)
     {
-      using StdRegProvHelper Registry = new(CreatedClassName);
-      var returnValue = (uint)(Registry.Provider as dynamic).EnumKey(unchecked((int)hDefKey), sSubKeyName, out dynamic sNamesObj);
+      string methodName = GetMethodName(new());
+      ManagementClass classObj = new(CreatedClassName);
+      ManagementBaseObject inParams = classObj.GetMethodParameters(methodName);
+      inParams["hDefKey"] = hDefKey;
+      inParams["sSubKeyName"] = sSubKeyName;
+      ManagementBaseObject outParams = classObj.InvokeMethod(methodName, inParams, null);
+      dynamic sNamesObj = outParams["sNames"];
       sNames = [];
-      if (sNamesObj is object[])
-      {
-        static string cvobj2str(object item) => item.ToString();
-        sNames = Array.ConvertAll(sNamesObj, (Converter<object, string>)cvobj2str);
-      }
-      return returnValue;
+      if (sNamesObj is object[]) sNames = sNamesObj;
+      return (uint)outParams["ReturnValue"];
     }
 
     public static uint GetStringValue(out string sValue, string sSubKeyName = null, string sValueName = null, uint? hDefKey = null)
     {
-      using StdRegProvHelper Registry = new(CreatedClassName);
-      return (uint)(Registry.Provider as dynamic).GetStringValue(hDefKey.HasValue ? (unchecked((int)hDefKey) as dynamic) : Missing.Value, sSubKeyName, sValueName, out sValue);
+      string methodName = GetMethodName(new());
+      ManagementClass classObj = new(CreatedClassName);
+      ManagementBaseObject inParams = classObj.GetMethodParameters(methodName);
+      if (hDefKey.HasValue) inParams["hDefKey"] = (uint)hDefKey;
+      inParams["sSubKeyName"] = sSubKeyName;
+      inParams["sValueName"] = sValueName;
+      ManagementBaseObject outParams = classObj.InvokeMethod(methodName, inParams, null);
+      sValue = outParams["sValue"] as string;
+      return (uint)outParams["ReturnValue"];
     }
 
     public static uint SetStringValue(uint hDefKey, string sSubKeyName, string sValue, string sValueName = null)
     {
-      using StdRegProvHelper Registry = new(CreatedClassName);
-      return (uint)(Registry.Provider as dynamic).SetStringValue(unchecked((int)hDefKey), sSubKeyName, sValueName, sValue);
+      string methodName = GetMethodName(new());
+      ManagementClass classObj = new(CreatedClassName);
+      ManagementBaseObject inParams = classObj.GetMethodParameters(methodName);
+      inParams["hDefKey"] = hDefKey;
+      inParams["sSubKeyName"] = sSubKeyName;
+      inParams["sValueName"] = sValueName;
+      inParams["sValue"] = sValue;
+      ManagementBaseObject outParams = classObj.InvokeMethod(methodName, inParams, null);
+      return (uint)outParams["ReturnValue"];
     }
 
     /// <summary>Remove the key and all descendant subkeys.</summary>
@@ -72,34 +107,11 @@ namespace ROOT.CIMV2
       return returnValue += DeleteKey(hDefKey, sSubKeyName);
     }
 
-    class StdRegProvHelper : IDisposable
-    {
-      SWbemLocator wbemLocator = new();
-      SWbemServices wbemService;
-      internal SWbemObject Provider;
-
-      internal StdRegProvHelper(string className)
-      {
-        wbemService = wbemLocator.ConnectServer();
-        Provider = wbemService.Get(className);
-      }
-
-      /// <summary>Release the specified COM object.</summary>
-      /// <param name="comObject">The COM object to destroy.</param>
-      static void ReleaseComObject<T>(ref T comObject)
-      {
-        Marshal.FinalReleaseComObject(comObject);
-        comObject = default;
-      }
-
-      public void Dispose()
-      {
-        ReleaseComObject(ref Provider);
-        ReleaseComObject(ref wbemService);
-        ReleaseComObject(ref wbemLocator);
-      }
-    }
-
     static string GetTypeName() => new StackTrace().GetFrame(0).GetMethod().DeclaringType.Name;
+
+    /// <summary>Get the name of the method calling this method.</summary>
+    /// <param name="stackTrace">The stack trace from the calling method.</param>
+    /// <returns>The name of the caller method.</returns>
+    static string GetMethodName(StackTrace stackTrace) => stackTrace.GetFrame(0).GetMethod().Name;
   }
 }

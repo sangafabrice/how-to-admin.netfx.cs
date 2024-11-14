@@ -1,4 +1,4 @@
-<!-- 0.0.1.0 -->
+<!-- 0.0.1.1 -->
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>library</OutputType>
@@ -8,8 +8,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="src\AssemblyInfo.cs;src\StdRegProv.cs" />
-    <Reference Include="Interop.WbemScripting.dll">
-      <HintPath>lib\Interop.WbemScripting.dll</HintPath>
+    <Reference Include="System.Management.dll">
+      <HintPath>C:\Windows\Microsoft.Net\assembly\GAC_MSIL\System.Management\v4.0_4.0.0.0__b03f5f7f11d50a3a\System.Management.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>
