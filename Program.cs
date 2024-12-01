@@ -1,23 +1,20 @@
 /// <summary>Launch the shortcut's target PowerShell script with the markdown.</summary>
-/// <version>0.0.1.0</version>
+/// <version>0.0.1.1</version>
 
 using System;
 using System.Diagnostics;
 using System.Reflection;
-using System.ComponentModel;
-using System.Security.Principal;
 using System.Management;
 
 namespace cvmd2html
 {
   static class Program
   {
-    static void Main(string[] args)
+    static void Main()
     {
       /** The application execution. */
       if (!string.IsNullOrEmpty(Parameters.Markdown))
       {
-        RequestAdminPrivileges(args);
         const string CMD_EXE = @"C:\Windows\System32\cmd.exe";
         const string CMD_LINE_FORMAT = @"/d /c """"{0}"" 2> ""{1}""""";
         Package.IconLink.Create(Parameters.Markdown);
@@ -66,37 +63,6 @@ namespace cvmd2html
       // Wait for the process to exit.
       return (uint)new ManagementEventWatcher(wmiQuery).WaitForNextEvent()["ExitStatus"];
     }
-
-    /// <summary>Request administrator privileges.</summary>
-    /// <param name="args">The command line arguments.</param>
-    static void RequestAdminPrivileges(string[] args)
-    {
-      if (IsCurrentProcessElevated()) return;
-      try
-      {
-        Process.Start(
-          new ProcessStartInfo(Path, args.Length > 0 ? string.Format(@"""{0}""", string.Join(@""" """, args)):"")
-          {
-            UseShellExecute = true,
-            Verb = "runas",
-            WindowStyle = ProcessWindowStyle.Hidden
-          }
-        );
-      }
-      catch (Win32Exception)
-      {
-        Quit(0);
-      }
-      catch (Exception)
-      {
-        Quit(1);
-      }
-      Quit(0);
-    }
-
-    /// <summary>Check if the process is elevated.</summary>
-    /// <returns>True if the running process is elevated, false otherwise.</returns>
-    static bool IsCurrentProcessElevated() => new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
 
     /// <summary>Clean up and quit.</summary>
     /// <param name="exitCode">The exit code.</param>
